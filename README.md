@@ -58,8 +58,8 @@ MIT. Take it, fork it, change it, share it.
 
 ## Credit
 
-Built and maintained by [Filipa Castro][filipa-link]. If you build something with this, I'd love to hear about it.
+Built and maintained by [Filipa Rodrigues][filipa-link]. If you build something with this, I'd love to hear about it.
 
-[post-1-link]: #
+[post-1-link]: https://medium.com/@filipacsr/why-i-built-my-own-food-coach-972d330beeb4
 [post-2-link]: #
 [filipa-link]: https://thehumanruntime.com
