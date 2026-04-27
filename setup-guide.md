@@ -1,100 +1,73 @@
 # Setup Guide
 
-This walks you through getting the food coach running. The instructions are written for Claude (Projects feature), but the same pattern works in any LLM that supports persistent context.
+This is the actual setup behind the food coach in [the Medium posts][post-1-link]. Five steps. Should take about five minutes.
 
-## Step 1: Fill in the context file
+## 1. Create a Claude Project
 
-Open `context-file-template.md` and replace the placeholders with your own information. Some sections will be detailed from day one (Purpose & Context, Current State); others will be sparse and grow over time (Key Learnings & Principles).
+In Claude, create a new Project. You can call it "Food Coach" or whatever fits.
 
-Don't try to predict everything. The Approach & Patterns section, in particular, fills in as you correct the coach. A bare first version is fine.
+If you're new to Projects: a Project is a workspace where Claude has access to specific files and instructions across every conversation you have inside it. It's how the coach stays consistent across sessions instead of starting from zero each time.
 
-## Step 2: Set up the log
+## 2. Set the project description
 
-Copy `meal-log-template.csv` to wherever you want it to live. Options:
+Open `project-description.md`, copy the description text, and paste it into your project's description field.
 
-- **Local file** — simplest, but only accessible from one device
-- **Cloud storage** (Google Drive, Dropbox) — accessible everywhere
-- **Project folder in your LLM** — most LLMs let you attach files to a project so they're available in every conversation
+The description is short on purpose. It tells Claude what the project is *for*. The behavior comes from the next step.
 
-I use a CSV in a project folder. Whatever you pick, make sure the path is reachable from wherever you'll be having coach conversations.
+## 3. Set the project instructions
 
-## Step 3: Wire it into your LLM
+Open `project-instructions.md`, copy the instruction text, and paste it into your project's instructions field.
 
-The goal is for the coach to have access to two things in every conversation: the context file and the log.
+This is the most important file in the repo. It defines what Claude does when you upload a meal photo, what micronutrients to track, when to summarize. Adapt it freely:
 
-### If you're using Claude Projects
+- **Different micronutrients** — change the list to whatever you care about.
+- **Different summary cadence** — weekly is mine; daily, biweekly, or monthly all work.
+- **Different log fields** — if you want to track sodium, fiber, glycemic load, or anything else, add it to the instruction.
+- **Different goals** — if you're focused on a specific outcome (fat loss, muscle gain, energy, recovery), say so. The coach will adapt suggestions to that focus.
 
-1. Create a new project called "Food Coach" (or whatever you want).
-2. Add `context-file-template.md` (filled in) as a project file.
-3. Add your meal log CSV as a project file.
-4. In the project's custom instructions, paste the seed prompt below.
+## 4. Add the CSV
 
-### If you're using ChatGPT or another LLM
+Add `food_log.csv` to the project as a file. It starts empty (just the column headers). Claude will append rows to it as you log meals.
 
-1. Use a long-running conversation, or set up a custom GPT / equivalent feature.
-2. Paste the filled-in context file at the start of each session, or attach it as a file.
-3. Attach the CSV as a file (or paste recent rows if your LLM doesn't support file attachments).
-4. Use the seed prompt below as the system prompt or first message.
+If you'd rather use different columns, edit the CSV before you add it. Whatever columns are in the file are what Claude will use.
 
-### Seed prompt
+## 5. Make sure memory is on
 
-```
-You are my food coach. I've shared a context file (context.md) with my goals,
-habits, baselines, and conventions, and a meal log (food_log.csv) with my
-recent meals.
+Claude's memory feature needs to be enabled for the personalization to accrue over time. This is what lets the coach remember your habits, your preferences, the corrections you've made, the patterns you're investigating — without you having to re-tell it each session.
 
-Your job:
-- Help me log meals from photos. When I share a photo of a meal, menu, or
-  packaged label, decompose it into individual ingredients and append rows
-  to the CSV. One row per ingredient. Visible label values override estimation.
-- Apply the defaults from the context file without being prompted (cooking
-  fats, recurring staples, etc.).
-- Answer questions about how I've been eating across days, not just single
-  meals — protein adequacy, micronutrient gaps, alignment with my goals.
-- When I'm at a restaurant and share a menu, suggest the best option for me
-  given what I've been eating recently and what I'm working toward.
-- When I correct you, update the context file — not just the moment.
+You can check the memory setting in Claude's settings (look for "Memory" or "Personalization"). It should be on at the account level, and on for this project specifically if there's a per-project toggle.
 
-Read the context file before answering any question.
-```
+## How it grows
 
-You can adapt this. The important parts are: read the context file, decompose meals, apply defaults, answer across days, update the file when corrected.
+The setup above is small on purpose. Most of what makes the coach actually useful — knowing your protein staples, your favorite restaurants, the foods you eat repeatedly, the corrections you've made — *isn't* configured. It accrues.
 
-## Step 4: Start logging
+Day one, the coach is generic. By week two, it knows you cook eggs in olive oil and stops asking. By month two, it knows what "the usual" means at your favorite lunch spot. By month six, it's caught patterns you didn't know were there.
 
-Begin with whatever feels natural. A photo of breakfast, a question about lunch, a menu from dinner. The coach will be rough at first — that's expected.
+That's the system working. The setup is just the seed.
 
-When it gets something wrong, two things should happen:
+## What you can do to help it along
 
-1. Fix the immediate thing (re-log the meal, change the row, clarify the question).
-2. Move the correction back into the context file. If a phrase was ambiguous, that goes in *Key Learnings & Principles*. If a default was missing, that goes in *Current State* or *Approach & Patterns*. If a goal was misunderstood, that goes in *Purpose & Context*.
+Three small habits that make the personalization land faster:
 
-This is the loop that makes the system more personal over time. Without it, the coach stays generic.
+1. **Correct things immediately.** If Claude estimates a portion wrong, say so. If it interprets a phrase the way you didn't mean it, clarify. The corrections become memory.
 
-## Step 5: Iterate
+2. **Use natural language about your goals and habits.** Don't try to "configure" Claude — just talk. "I'm trying to gain muscle this month" or "I always cook with cast iron" lands in memory the same way explicit instructions would.
 
-After a week, look at the context file again. Is anything in it stale? Anything missing that came up repeatedly in conversation? Update it.
-
-After a month, the file should look meaningfully different from the version you started with. That's the system working as intended.
+3. **Ask real questions.** Don't just log. Ask "have I been getting enough protein this week?" or "what's the best thing on this menu for me?" The coach gets sharper through use.
 
 ## Common questions
 
-**How long should the context file be?**
-
-Mine sits between half a page and a page when I trim it. Longer than that and it starts taking up tokens better spent on actual reasoning. If a section grows beyond what feels useful, prune the bullets that are no longer relevant.
-
-**Do I need to start each conversation fresh?**
-
-Depends on the LLM. In Claude Projects, the context file is available in every conversation automatically — you can start fresh each time and not lose continuity. In other setups, you may want to keep one long conversation, or paste the context file at the start of each new one.
-
 **What if I don't want to track macros?**
 
-Change the CSV columns to whatever you actually care about — sodium, fiber, specific micronutrients, glycemic load, satiety scores. The template uses macros because that's what I track; the structure works with any columns.
+Change the CSV columns to whatever you actually care about — sodium, fiber, specific micronutrients, glycemic load, satiety. The structure works with any columns. Update the project instructions to match.
 
-**What if the coach hallucinates a number?**
+**Do I need to start each conversation fresh, or keep one long thread?**
 
-For exact nutrient values where the number really matters (specific micronutrient amounts, supplement doses), verify against a database. The coach is for judgment and pattern reading. Look-up tables are for facts.
+Either works. With memory on, fresh conversations carry the personalization automatically. 
 
-**Can I share my context file with someone else?**
+**What if Claude hallucinates a number?**
 
-The whole point of the context file is that it's about *you*. Sharing it doesn't help anyone else, and the structure is what matters anyway — that's already in this template. Share the template, not your file.
+For exact nutrient values that really matter (specific micronutrient amounts, supplement doses), verify against a database. The coach is for judgment and pattern reading. Look-up tables are for facts.
+
+
+[post-1-link]: https://medium.com/@filipacsr/why-i-built-my-own-food-coach-972d330beeb4 
